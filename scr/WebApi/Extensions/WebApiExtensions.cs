@@ -1,11 +1,11 @@
 ﻿using Application;
 using Application.Security;
+using Asp.Versioning;
 using Carter;
 using Infraestructure;
 using Microsoft.Extensions.Options;
 using Presentation;
 using Serilog;
-
 namespace WebApi.Extensions;
 
 public static class WebApiExtensions
@@ -17,6 +17,23 @@ public static class WebApiExtensions
         );
 
         builder.Services.AddEndpointsApiExplorer();
+
+        builder.Services.AddApiVersioning(options =>
+        {
+            options.DefaultApiVersion = new(5, 0);
+            options.AssumeDefaultVersionWhenUnspecified = true;
+            options.ReportApiVersions = true;
+            options.ApiVersionReader = ApiVersionReader.Combine(
+                new UrlSegmentApiVersionReader(),
+                new HeaderApiVersionReader("X-Api-Version"));
+
+        }).AddApiExplorer(options =>
+        {
+            // add the versioned api explorer, which also adds IApiVersionDescriptionProvider service
+            options.GroupNameFormat = "'v'VVV";
+            options.SubstituteApiVersionInUrl = true;
+        });
+
         builder.Services.AddSwagger();
 
         builder.Services.AddCarter();

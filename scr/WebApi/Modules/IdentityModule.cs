@@ -1,4 +1,6 @@
 ﻿using Application.Security;
+using Asp.Versioning;
+using Asp.Versioning.Builder;
 using Carter;
 using Domain.Models;
 
@@ -7,7 +9,12 @@ public class IdentityModule : CarterModule
 {
     public override void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("/login", (ILogger<IdentityModule> log, JwtGenerator jwtService, LoginModel model) =>
+        ApiVersionSet apiVersionSet = app.NewApiVersionSet("Login")
+        .HasApiVersion(new ApiVersion(1))
+        .ReportApiVersions()
+        .Build();
+
+        app.MapPost("/api/v{version:apiVersion}/login", (ILogger<IdentityModule> log, JwtGenerator jwtService, LoginModel model) =>
         {
             if (jwtService.IsValidUser(model.Username, model.Password))
             {
@@ -21,6 +28,8 @@ public class IdentityModule : CarterModule
                 return Results.Unauthorized();
             }
         })
-        .AllowAnonymous();
+            .WithApiVersionSet(apiVersionSet)
+            .MapToApiVersion(1)
+            .AllowAnonymous();
     }
 }

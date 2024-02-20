@@ -1,3 +1,4 @@
+using Asp.Versioning.ApiExplorer;
 using Carter;
 using Presentation.Middlewares;
 using Serilog;
@@ -16,18 +17,27 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseSerilogRequestLogging();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
 app.UseHttpsRedirection();
-
-app.UseAuthentication();
-app.UseAuthorization();
 
 // Map Endpoints
 app.MapCarter();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        IReadOnlyList<ApiVersionDescription> descriptions = app.DescribeApiVersions();
+
+        foreach (ApiVersionDescription description in descriptions)
+        {
+            options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json",
+                $"Minimal Api - {description.GroupName.ToUpper()}");
+        }
+    });
+}
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.Run();

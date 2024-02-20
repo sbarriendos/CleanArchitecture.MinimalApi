@@ -1,5 +1,7 @@
 ﻿using Application.Posts.Commands;
 using Application.Posts.Queries;
+using Asp.Versioning;
+using Asp.Versioning.Builder;
 using Carter;
 using Domain.Models;
 using FluentValidation;
@@ -11,38 +13,39 @@ namespace WebApi.Modules;
 
 public class PostsModule : CarterModule
 {
-    public PostsModule()
-        : base("/api/posts")
-    {
-    }
     public override void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/{id}", GetPost)
+        ApiVersionSet apiVersionSet = app.NewApiVersionSet("Post")
+        .HasDeprecatedApiVersion(new ApiVersion(0.1))
+        .HasApiVersion(new ApiVersion(1))
+        .ReportApiVersions()
+        .Build();
+
+        RouteGroupBuilder group = app.MapGroup("/api/v{version:apiVersion}/posts")
+            .WithApiVersionSet(apiVersionSet)
+            .MapToApiVersion(1);
+
+        group.MapGet("/{id}", GetPost)
             .WithName("GetPostById");
 
-        app.MapGet("/", GetAllPosts)
+        group.MapGet("/", GetAllPosts)
             .WithName("GetAllPost");
 
-        app.MapPost("/", CreatePost)
+        group.MapPost("/", CreatePost)
             .AddEndpointFilter<ValidationFilter<Post>>()
             .WithName("CreatePost");
 
-        app.MapPut("/{id}", UpdatePost)
+        group.MapPut("/{id}", UpdatePost)
             .AddEndpointFilter<ValidationFilter<Post>>()
             .WithName("UpdatePost");
 
-        app.MapDelete("/{id}", DeletePost)
+        group.MapDelete("/{id}", DeletePost)
             .WithName("DeletePost");
     }
-    private static async Task<NoContent> DeletePost(IMediator mediator, int id)
+    private static async Task<IResult> GetPost(ILogger<PostsModule> log, IMediator mediator, int id)
     {
-        DeletePostCommand deletePost = new() { PostId = id };
-        await mediator.Send(deletePost);
+        log.LogInformation("Get Post V1");
 
-        return TypedResults.NoContent();
-    }
-    private static async Task<IResult> GetPost(IMediator mediator, int id)
-    {
         GetPostQuery getPost = new() { PostId = id };
         Post post = await mediator.Send(getPost);
 
@@ -69,5 +72,11 @@ public class PostsModule : CarterModule
 
         return TypedResults.Ok(updatedPost);
     }
+    private static async Task<NoContent> DeletePost(IMediator mediator, int id)
+    {
+        DeletePostCommand deletePost = new() { PostId = id };
+        await mediator.Send(deletePost);
 
+        return TypedResults.NoContent();
+    }
 }
