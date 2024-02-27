@@ -1,25 +1,43 @@
 # Clean Architecture - Minimal Api 
 
 ## Domain Layer
-- Models
+- DomainEvents
+- Entities
+- Enums
+- Errors
+- Exceptions
+- Primitives
+- Repositories
+- Shared
+- ValueObjects
 
 ## Application Layer
-- Repository Abstrations
-- CQRS and Mediatr
+- Abstrations (Repository)
+- Dtos
+- Api Business Logic (Ex: Posts): CQRS and Mediatr
   - Commands
   - CommandHandlers
   - Queries
   - QueryHandlers
 - Security. Replace with stronger methods
-- Typed Config (appsettings.json)
+- Settings (Typed Config, appsettings.json)
+
+DependencyInjection.cs/AssemblyReference.cs
 
 ## Infraestructure Layer
 - Database Context
 - Repositories
+- Services
+- BackgroundJobs
+
+DependencyInjection.cs/AssemblyReference.cs
 
 ## Presentation Layer
+- Abstractions
+- Contracts
 - Middleware
   - ExceptionHandlingMiddleware
+- Configurations
 - Validators (FluentValidator)
 
 ## Web Api
