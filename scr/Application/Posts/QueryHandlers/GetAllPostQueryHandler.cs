@@ -1,13 +1,15 @@
 ﻿using Application.Abstractions;
+using Application.Dtos;
 using Application.Posts.Queries;
-using Domain.Models;
 using MediatR;
 
 namespace Application.Posts.QueryHandlers;
-public class GetAllPostQueryHandler(IPostRepository postRepository) : IRequestHandler<GetAllPostQuery, ICollection<Post>>
+public class GetAllPostQueryHandler(IMapper mapper, IPostRepository postRepository) : IRequestHandler<GetAllPostQuery, ICollection<PostDto>>
 {
-    public async Task<ICollection<Post>> Handle(GetAllPostQuery request, CancellationToken cancellationToken)
+    public async Task<ICollection<PostDto>> Handle(GetAllPostQuery request, CancellationToken cancellationToken)
     {
-        return await postRepository.GetAllPosts();
+        var a = await postRepository.GetAllPosts();
+
+        return _mapper.Map<ProductDTO>(product);
     }
 }

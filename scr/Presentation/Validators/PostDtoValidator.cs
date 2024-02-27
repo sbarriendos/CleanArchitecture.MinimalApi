@@ -1,10 +1,10 @@
-﻿using Domain.Models;
+﻿using Domain.Entites;
 using FluentValidation;
 
 namespace Presentation.Validators;
-public class PostValidator : AbstractValidator<Post>
+public class PostDtoValidator : AbstractValidator<PostEntity>
 {
-    public PostValidator()
+    public PostDtoValidator()
     {
         RuleFor(p => p.Content).NotEmpty().WithMessage("Content is required");
     }

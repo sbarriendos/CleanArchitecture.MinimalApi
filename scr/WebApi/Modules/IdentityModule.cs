@@ -14,7 +14,7 @@ public class IdentityModule : CarterModule
         .ReportApiVersions()
         .Build();
 
-        app.MapPost("/api/v{version:apiVersion}/login", (ILogger<IdentityModule> log, JwtGenerator jwtService, LoginModel model) =>
+        app.MapPost("/api/v{version:apiVersion}/login", (ILogger<IdentityModule> log, JwtGenerator jwtService, LoginDto model) =>
         {
             if (jwtService.IsValidUser(model.Username, model.Password))
             {

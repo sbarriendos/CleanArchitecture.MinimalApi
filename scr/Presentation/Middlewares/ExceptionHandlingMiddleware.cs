@@ -23,7 +23,7 @@ public class ExceptionHandlingMiddleware(RequestDelegate _next)
         context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
         context.Response.ContentType = "application/json";
 
-        ErrorResponse errorResponse = new()
+        ErrorResponseDto errorResponse = new()
         {
             Message = "Error in Request",
             Details = exception.Message

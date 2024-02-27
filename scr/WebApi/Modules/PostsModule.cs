@@ -1,9 +1,10 @@
-﻿using Application.Posts.Commands;
+﻿using Application.Dtos;
+using Application.Posts.Commands;
 using Application.Posts.Queries;
 using Asp.Versioning;
 using Asp.Versioning.Builder;
 using Carter;
-using Domain.Models;
+using Domain.Entites;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -32,11 +33,11 @@ public class PostsModule : CarterModule
             .WithName("GetAllPost");
 
         group.MapPost("/", CreatePost)
-            .AddEndpointFilter<ValidationFilter<Post>>()
+            .AddEndpointFilter<ValidationFilter<PostEntity>>()
             .WithName("CreatePost");
 
         group.MapPut("/{id}", UpdatePost)
-            .AddEndpointFilter<ValidationFilter<Post>>()
+            .AddEndpointFilter<ValidationFilter<PostEntity>>()
             .WithName("UpdatePost");
 
         group.MapDelete("/{id}", DeletePost)
@@ -47,28 +48,28 @@ public class PostsModule : CarterModule
         log.LogInformation("Get Post V1");
 
         GetPostQuery getPost = new() { PostId = id };
-        Post post = await mediator.Send(getPost);
+        PostDto post = await mediator.Send(getPost);
 
         return TypedResults.Ok(post);
     }
     private static async Task<IResult> GetAllPosts(IMediator mediator)
     {
         GetAllPostQuery getAllPost = new();
-        ICollection<Post> posts = await mediator.Send(getAllPost);
+        ICollection<PostDto> posts = await mediator.Send(getAllPost);
 
         return TypedResults.Ok(posts);
     }
-    private static async Task<object> CreatePost(IMediator mediator, Post post)
+    private static async Task<object> CreatePost(IMediator mediator, PostEntity post)
     {
         CreatePostCommand createPost = new() { PostContent = post.Content };
-        Post createdPost = await mediator.Send(createPost);
+        PostDto createdPost = await mediator.Send(createPost);
 
         return Results.CreatedAtRoute("GetPostById", new { createdPost.Id }, createdPost);
     }
-    private static async Task<Ok<Post>> UpdatePost(IMediator mediator, Post post, int id)
+    private static async Task<Ok<PostDto>> UpdatePost(IMediator mediator, PostEntity post, int id)
     {
         UpdatePostCommand updatePost = new() { PostId = id, PostContent = post.Content };
-        Post updatedPost = await mediator.Send(updatePost);
+        PostDto updatedPost = await mediator.Send(updatePost);
 
         return TypedResults.Ok(updatedPost);
     }

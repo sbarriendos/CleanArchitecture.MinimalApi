@@ -1,11 +1,11 @@
-﻿using Domain.Models;
+﻿using Domain.Entites;
 
 namespace Application.Abstractions;
 public interface IPostRepository
 {
-    Task<ICollection<Post>> GetAllPosts();
-    Task<Post?> GetPost(int postId);
-    Task<Post> CreatePost(Post toCreate);
-    Task<Post> UpdatePost(int postId, string? updatedContent);
+    Task<ICollection<PostEntity>> GetAllPosts();
+    Task<PostEntity?> GetPost(int postId);
+    Task<PostEntity> CreatePost(PostEntity toCreate);
+    Task<PostEntity> UpdatePost(int postId, string? updatedContent);
     Task DeletePost(int postId);
 }
